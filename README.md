@@ -4,4 +4,3 @@ if you want to update firmware of your board, download the compiled binaries fro
 
 # News in release 2.0-beta4
 - added SPIFFS WEBGUI for WiFi setting
-- test
