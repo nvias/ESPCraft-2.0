@@ -1,6 +1,5 @@
 #include <WiFi.h>
 #include <ESPmDNS.h>
-//#include <WiFiUdp.h>
 #include <PubSubClient.h>
 #include <FastLED.h>
 #include <Wire.h>
@@ -12,8 +11,10 @@
 #include <ESPAsyncWebServer.h>
 #include <AsyncElegantOTA.h>
 #include <SPIFFS.h>
+#include <HTTPClient.h>
 #include "settings.h"
 #include "version.h"
+#include "flash_alloc.h"
 
 const char *ssid = "";
 const char *password = "";
@@ -24,6 +25,28 @@ PubSubClient client(espClient);
 AsyncWebServer server(80);
 String msg = "               ";
 bool lastLedState = 0;
+char uuid[15] = "";
+
+const char wifiSet[] PROGMEM =
+    "<!DOCTYPE html>"
+    "\n<html>"
+    "\n<title>ESP Craft OS 2.0 fail-safe GUI</title>"
+    "\n<meta charset=\"UTF-8\">"
+    "\n<meta name=\"viewport\" content=\"width=device-width, initial-scale=1\">"
+    "\n"
+    "\n<body>"
+    "\n  <br>"
+    "\n  <h1> ESP Craft OS 2.0 WiFi fail-safe setting</h1>"
+    "\n  <br>"
+    "\n  <form class=\"form-inline\" action=\"/wifi\" method=\"POST\">"
+    "\n    <label for=\"email\">SSID:  </label> <input type=\"text\" placeholder=\"Your WiFi name\" name=\"ssid\">"
+    "\n    <label for=\"pwd\">Password: </label> <input type=\"text\" placeholder=\"Your WiFi password\" name=\"pass\">"
+    "\n    <button type=\"submit\">Submit</button>"
+    "\n  </form>"
+    "\n  <p>Warning: This board works with 2.4 GHz networks only!</p>"
+    "\n</body>"
+    "\n"
+    "\n</html>";
 
 //----------------------------------------------------------------------------------------------------------
 
@@ -284,10 +307,18 @@ void setup()
   {
     Serial.println("[SYSTEM] mDNS service running...");
   }
+  if (!SPIFFS.exists("/index.html"))
+  {
+    Serial.println("[SYSTEM] WiFi WEBGUI not present, rewriting to fail-safe...");
+    File file = SPIFFS.open("/index.html", "w");
+    file.print(wifiSet);
+    file.close();
+  }
+
   if (WiFi.waitForConnectResult() != WL_CONNECTED)
   {
     Serial.println("[SYSTEM] Connection to WiFI failed, setting up Acces Point.");
-    WiFi.softAP(uuid, "espcraft");
+    WiFi.softAP("ESP Block", "espcraft");
     Serial.print("[SYSTEM] IP address: ");
     Serial.println(WiFi.softAPIP());
   }
@@ -297,14 +328,52 @@ void setup()
     Serial.println(WiFi.localIP());
   }
 
+  String readUuid = "ESPblock(";
+  for (int l = SET_ADDR + 3; l < SET_ADDR + 7; l++)
+  {
+    char data = EEPROM.read(l);
+    if (data != '$')
+    {
+      readUuid += data;
+    }
+    else
+    {
+      break;
+    }
+  }
+  readUuid += ")";
+  readUuid.toCharArray(uuid, 15);
+
   //--------------------------------------------------------------------------------------------------------------------------------------------
   server.on("/", HTTP_GET, [](AsyncWebServerRequest *request) {
     request->send(SPIFFS, "/index.html", String(), false);
   });
+  server.on("/reset", HTTP_GET, [](AsyncWebServerRequest *request) {
+    SPIFFS.remove("/index.html");
+    File file = SPIFFS.open("/index.html", "w");
+    file.print(wifiSet);
+    file.close();
+    for (int j = 0; j < 4; j++)
+    {
+      EEPROM.write(SET_ADDR + 3 + j, '0');
+    }
+    EEPROM.write(SET_ADDR + 7, '$');
+    EEPROM.commit();
+    Serial.println("[SYSTEM] Performed reset!");
+    Serial.println("[SYSTEM] Wifi set WEBGUI rewritten to fail-safe version.");
+    Serial.println("[SYSTEM] UUID set to 0000");
+    request->send(SPIFFS, "/index.html", String(), false);
+  });
+  server.on("/perip", HTTP_GET, [](AsyncWebServerRequest *request) {
+    request->send(SPIFFS, "/perip.html", String(), false);
+  });
+  server.on("/uuid", HTTP_GET, [](AsyncWebServerRequest *request) {
+    request->send(SPIFFS, "/uuid.html", String(), false);
+  });
 
-  server.on("/", HTTP_POST, [](AsyncWebServerRequest *request) {
+  server.on("/wifi", HTTP_POST, [](AsyncWebServerRequest *request) {
     int params = request->params();
-    Serial.printf("%d params sent in\n", params);
+    Serial.printf("[HTTP CLIENT] %d params sent in\n", params);
     for (int i = 0; i < params; i++)
     {
       AsyncWebParameter *p = request->getParam(i);
@@ -344,12 +413,78 @@ void setup()
     request->send(SPIFFS, "/index.html", String(), false);
   });
 
+  server.on("/perip", HTTP_POST, [](AsyncWebServerRequest *request) {
+    int params = request->params();
+    Serial.printf("[HTTP CLIENT] %d params sent in\n", params);
+    String data = "";
+    for (int i = 0; i < params; i++)
+    {
+      AsyncWebParameter *p = request->getParam(i);
+      if (p->isPost())
+      {
+        data += p->value().c_str();
+        data += " ";
+      }
+    }
+    char command[32] = "";
+    data.toCharArray(command, 32);
+    for (int i = 0; i < 3; i++) //---------------- (push -> pot -> leds)
+    {
+      bool comp = 1;
+      for (int j = 0; j < 3; j++)       //-------------- (p->u->s)
+      {                                 //                |
+        if (command[j] != perips[i][j]) //-------- (p!=p OR u!=u OR s!=s ? 0:1)
+        {
+          comp = 0;
+        }
+      }
+      if (comp) //-------------------------------- (true(above) ?)
+      {
+        for (int x = 0; x < 3; x++)
+        {
+          if (command[4] == ports[0][x] || command[5] == ports[0][x])
+          {
+            char response[] = "";
+            sprintf(response, "[SYSTEM] Periphreal board \"%s\" is now attached to the %s port.", perips[i], ports[x + 1]);
+            Serial.println(response);
+            EEPROM.write(SET_ADDR + x, byte(i));
+            EEPROM.commit();
+          }
+        }
+      }
+    }
+
+    request->send(SPIFFS, "/perip.html", String(), false);
+  });
+
+  server.on("/uuid", HTTP_POST, [](AsyncWebServerRequest *request) {
+    int params = request->params();
+    Serial.printf("[HTTP CLIENT] %d params sent in\n", params);
+    for (int i = 0; i < params; i++)
+    {
+      AsyncWebParameter *p = request->getParam(i);
+      if (p->isPost())
+      {
+        String data = p->value().c_str();
+        data = data + +"$";
+        for (int j = 0; j < data.length() - 1; j++)
+        {
+          EEPROM.write(SET_ADDR + 3 + j, data[j]);
+        }
+        EEPROM.commit();
+        Serial.println("[SYSTEM] UUID set to " + data);
+      }
+    }
+    request->send(SPIFFS, "/uuid.html", String(), false);
+  });
+
   AsyncElegantOTA.begin(&server);
   server.begin();
-  Serial.println("[SYSTEM] HTTP server started");
+  Serial.println("[HTTP CLIENT] HTTP server started");
   //---------------------------------------------------------------------------------------------------------------------------------------------
 
   Serial.println("[SYSTEM] Reset the board and hold user button when blue LED is light up to for settings...");
+  Serial.println("[SYSTEM] ESPCraftOS " + String(OS_VERSION) + " ready. Starting MQTT client...\n");
 
   digitalWrite(LED_BUILTIN, LOW);
   delay(100);
@@ -359,10 +494,76 @@ void setup()
   {
     delay(500);
     Serial.println("-----------------------------------------------------------------------");
-    Serial.println("[SYSTEM] Program mode acive!");
+    Serial.println("[SYSTEM] Setting mode acive!");
     digitalWrite(LED_BUILTIN, LOW);
     delay(100);
     digitalWrite(LED_BUILTIN, HIGH);
+    Serial.println("[SYSTEM] Performing SPIFFS file-check...");
+    File root = SPIFFS.open("/");
+    File file = root.openNextFile();
+
+    while (file)
+    {
+
+      Serial.print("[SPIFFS] FILE: ");
+      Serial.print(file.name());
+      Serial.print(", size: ");
+      Serial.print(file.size());
+      Serial.println(" bytes.");
+
+      file = root.openNextFile();
+    }
+    file.close();
+
+    delay(500);
+    if (!digitalRead(USER_BTN))
+    {
+      digitalWrite(LED_BUILTIN, LOW);
+      delay(1000);
+      digitalWrite(LED_BUILTIN, HIGH);
+      Serial.println("[SYSTEM] Performing SPIFFS NETGUI update, please do not turn off the board!");
+      server.end();
+      Serial.println("[SPIFFS] Deleting old files...");
+      SPIFFS.remove("/index.html");
+      SPIFFS.remove("/perip.html");
+      SPIFFS.remove("/uuid.html");
+      Serial.println("[SPIFFS] Downloading new files...");
+      File file = SPIFFS.open("/index.html", "w");
+      HTTPClient http;
+      http.begin("http://iot.e-iot.cz/index.html"); //Specify the URL and certificate
+      int httpCode = http.GET();                    //Make the request
+      if (httpCode == HTTP_CODE_OK)
+      { //Check for the returning code
+
+        http.writeToStream(&file);
+      }
+      file.close();
+      Serial.println("[SPIFFS] Downloaded file perip.html");
+      http.end(); //Free the resources
+      file = SPIFFS.open("/perip.html", "w");
+      http.begin("http://iot.e-iot.cz/perip.html"); //Specify the URL and certificate
+      httpCode = http.GET();                        //Make the request
+      if (httpCode == HTTP_CODE_OK)
+      { //Check for the returning code
+
+        http.writeToStream(&file);
+      }
+      file.close();
+      Serial.println("[SPIFFS] Downloaded file perip.html");
+      http.end(); //Free the resources
+      file = SPIFFS.open("/uuid.html", "w");
+      http.begin("http://iot.e-iot.cz/uuid.html"); //Specify the URL and certificate
+      httpCode = http.GET();                       //Make the request
+      if (httpCode == HTTP_CODE_OK)
+      { //Check for the returning code
+
+        http.writeToStream(&file);
+      }
+      file.close();
+      Serial.println("[SPIFFS] Downloaded file uuid.html");
+      http.end(); //Free the resources
+    }
+
     Serial.println("[SYSTEM] Set WiFi SSID/PASS with -s Your_WiFi_SSID or -p Your_WiFi_PASS");
     Serial.println("[SYSTEM] Or show help with -h");
     String data = "";
@@ -463,7 +664,6 @@ void setup()
       }
     }
   }
-  Serial.println("[SYSTEM] ESPCraftOS " + String(OS_VERSION) + " ready. Starting MQTT client...\n");
   client.setServer(MQTT_SERVER, MQTT_PORT);
   client.setCallback(callback);
   //----------------------------------------------------------------------------------------------------------

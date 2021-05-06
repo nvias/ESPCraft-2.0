@@ -17,7 +17,7 @@ const char ports[4][6] = {{"LRU"},                      // Identifikátoy portů
 const int gpio[6] = {26,25,19,18,35,34};                // Čísla GPIO pinů v portech (řazeno SDA, SCK)
 
 const char name[] = "ESPCraft";                         // Jméno desky
-const char uuid[] = "ESPblock(0010)";                   // Unikátní ID desky (M pro mentory - poslední M002), poslední 000F
+//const char uuid[] = "ESPblock(001D)";                   // Unikátní ID desky (M pro mentory - poslední M002), poslední 001D
 String mainTopic = "PI1";                               // Topic pro propojení se serverem
 
 #define NUM_LEDS    64                                  // Počet LED diod na displeji v kitu

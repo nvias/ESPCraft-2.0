@@ -1,21 +1,34 @@
-#define OS_VERSION "v.2.0-beta4"
+#define OS_VERSION "v.2.0-beta7"
 /*
-v.2.0 (beta4)
+CHANGELOG ------DD/MM/YYYY---------------------------------------------------------------------------------------------------------------
+v.2.0 (beta7)   06/05/2021
+- added webgui downloading software (hold user button unless long led light ~ 1s)
+- added fail-safe webgui and autoreset functions (address /reset)
+
+v.2.0 (beta6)   06/05/2021
+- reworked UUID handling
+- added GUI for UUID setting
+
+v.2.0 (beta5)   06/05/2021
+- added GUI for periphreal boards setting
+- added flash allocation scheme
+
+v.2.0 (beta4)   27/04/2021
 - added SPIFFS WEBGUI for WiFi setting
 
-v.2.0 (beta3)
+v.2.0 (beta3)   26/04/2021
 - added mDNS support (192.168.4.1/bluf -> espcraft.local/bluf)
 - bugfix (IP in AP mode shows 0.0.0.0)
 
-v.2.0 (beta2)
+v.2.0 (beta2)   26/04/2021
 - added auto AP (switch to Acces Point if WiFi is not accesible), SSID is ESPCraft(uuid), PASS is espcraft
 
-v.2.0 (beta1)
+v.2.0 (beta1)   26/04/2021
 - new OTA (Arduino OTA changed to Async Elegant OTA lib. - HTTP OTA)
 
-v.1.0 (release)
+v.1.0 (release) 12/04/2021
 - debug & settings via UART
 - supported peripreals - pushbutton, potentiometer & leds
-- support for OTA (Over The Air) programming
+- support for OTA (Over The Air) programming via Arduino OTA
 
 */
