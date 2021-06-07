@@ -5,9 +5,6 @@
 #define TEMP_PIN    32                                  // Vestavěné čidlo teploty (DS18B20)
 #define LIGHT_SNS   36                                  // Vestavěný senzor světla
 #define USER_BTN    0                                   // Tlačítko na desce (na nových verzích GPIO 0, na starších GPIO 16)
-#define SSID_ADDR   0                                   // 128 bajtů pro název sítě (SSID)
-#define PASS_ADDR   128                                 // 128 bajtů pro heslo sítě (PASS)
-#define SET_ADDR    256                                 // Adresa uloženého nastavení desky v EEPROM
 
 const char perips[3][5] = {{"push"},                    // Jména základních externích periferií
                            {"pot"},                     // (ID) tlačítko - 0, potenciometr - 1, ledky - 2
@@ -22,6 +19,7 @@ String mainTopic = "PI1";                               // Topic pro propojení 
 
 #define NUM_LEDS    64                                  // Počet LED diod na displeji v kitu
 #define DATA_PIN    27                                  // Pin na kterém jsou připojeny
+#define BRIGHTNESS  32                                  // Jas LED diod
 
 #define PD_ADDR     0x2A                                // Adresa Power Delivery controlleru na interní  I2C sběrnici
 

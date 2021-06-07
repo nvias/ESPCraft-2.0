@@ -184,6 +184,7 @@ void reconnect()
       //====================================================
       client.subscribe((mainTopic + "/" + String(uuid) + "/" + "tone").c_str());
       client.subscribe((mainTopic + "/" + String(uuid) + "/" + "octave").c_str());
+      client.subscribe((mainTopic + "/" + String(uuid) + "/" + "map").c_str());
 
       //====================================================
     }
@@ -207,6 +208,15 @@ void callback(char *topic, byte *payload, unsigned int length)
     Serial.print((char)payload[i]);
   }
   Serial.println();
+  if (topic[19] == 'm')
+  {
+    int value = 0;
+    for (int i = 0; i < length; i++)
+    {
+      value = value * 10 + payload[i] - 48;
+    }
+    display(value); // run simulation frame
+  }
   if (topic[19] == 't')
   {
     int value = 0;
@@ -261,10 +271,18 @@ void setup()
   Serial.println("[SYSTEM] Booting");
   pinMode(LED_BUILTIN, OUTPUT);
   pinMode(USER_BTN, INPUT_PULLUP);
-  delay(1000);
+  WiFi.mode(WIFI_STA);
+  //WiFi.begin("nvias.org", "22448132");
+  digitalWrite(LED_BUILTIN, LOW);
+  delay(100);
+  digitalWrite(LED_BUILTIN, HIGH);
+  //WiFi.waitForConnectResult();
   if (!SPIFFS.begin(true))
   {
     Serial.println("[SYSTEM] An Error has occurred while mounting SPIFFS!");
+    digitalWrite(LED_BUILTIN, LOW);
+    delay(100);
+    digitalWrite(LED_BUILTIN, HIGH);
     return;
   }
   String PASS = "";
@@ -297,11 +315,17 @@ void setup()
   password = PASS.c_str();
   Serial.print("[SYSTEM] Connecting to ");
   Serial.println(ssid);
-  WiFi.mode(WIFI_STA);
-  WiFi.begin(ssid, password);
+  if(WiFi.status() != WL_CONNECTED)
+  {
+    WiFi.begin(ssid, password);
+  }
+  WiFi.waitForConnectResult();
   if (!MDNS.begin("espcraft"))
   {
     Serial.println("[SYSTEM] Error starting mDNS");
+    digitalWrite(LED_BUILTIN, LOW);
+    delay(100);
+    digitalWrite(LED_BUILTIN, HIGH);
   }
   else
   {
@@ -313,19 +337,28 @@ void setup()
     File file = SPIFFS.open("/index.html", "w");
     file.print(wifiSet);
     file.close();
+    digitalWrite(LED_BUILTIN, LOW);
+    delay(500);
+    digitalWrite(LED_BUILTIN, HIGH);
   }
 
-  if (WiFi.waitForConnectResult() != WL_CONNECTED)
+  if (WiFi.status() != WL_CONNECTED)
   {
     Serial.println("[SYSTEM] Connection to WiFI failed, setting up Acces Point.");
     WiFi.softAP("ESP Block", "espcraft");
     Serial.print("[SYSTEM] IP address: ");
     Serial.println(WiFi.softAPIP());
+    digitalWrite(LED_BUILTIN, LOW);
+    delay(500);
+    digitalWrite(LED_BUILTIN, HIGH);
   }
   else
   {
     Serial.print("[SYSTEM] IP address: ");
     Serial.println(WiFi.localIP());
+    digitalWrite(LED_BUILTIN, LOW);
+    delay(100);
+    digitalWrite(LED_BUILTIN, HIGH);
   }
 
   String readUuid = "ESPblock(";
@@ -486,6 +519,7 @@ void setup()
   Serial.println("[SYSTEM] Reset the board and hold user button when blue LED is light up to for settings...");
   Serial.println("[SYSTEM] ESPCraftOS " + String(OS_VERSION) + " ready. Starting MQTT client...\n");
 
+  delay(100);
   digitalWrite(LED_BUILTIN, LOW);
   delay(100);
   digitalWrite(LED_BUILTIN, HIGH);
@@ -667,7 +701,8 @@ void setup()
   client.setServer(MQTT_SERVER, MQTT_PORT);
   client.setCallback(callback);
   //----------------------------------------------------------------------------------------------------------
-  FastLED.addLeds<WS2811, DATA_PIN, RGB>(leds, NUM_LEDS);
+  LEDS.addLeds<WS2812,DATA_PIN,RGB>(leds,NUM_LEDS);
+  FastLED.setBrightness(BRIGHTNESS);
 }
 //----------------------------------------------------------------------------------------------------------
 
@@ -694,5 +729,30 @@ void loop()
     readExternalPeriphreal(i, device);
   }
 
+  
+  
+
   client.loop();
+}
+
+
+void display(int color)
+{ 
+  byte bitmap[64] ={0,0,0,1,1,0,0,0,
+                    0,0,0,1,1,0,0,0,
+                    0,0,0,1,1,0,0,0,
+                    1,1,1,1,1,1,1,1,
+                    1,1,1,1,1,1,1,1,
+                    0,0,0,1,1,0,0,0,
+                    0,0,0,1,1,0,0,0,
+                    0,0,0,1,1,0,0,0};
+  
+  byte col[16][3] = {{0,0,0},{0,0,255},{0,255,0},{0,255,255}, {255,0,0},{255,0,255},{255,255,0},{255,255,255},
+                     {0,0,0},{0,0,127},{0,127,0},{0,127,127}, {127,0,0},{127,0,127},{127,127,0},{127,127,127}};
+
+	for(int i = 0; i < 64; i++){
+    leds[i] = CRGB(col[color][0]*bitmap[i],col[color][1]*bitmap[i],col[color][2]*bitmap[i]);
+    FastLED.show(); 
+    delay(1);
+	}
 }
