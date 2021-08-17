@@ -11,7 +11,7 @@
 </p>
 <hr/>
 
-# ESPCraft-2.0 (Work in progress, please use ver. beta8 from releases ->)
+# ESPCraft-2.0 (Work in progress, please use ver. 2.0-beta8 from releases)
 New ESP Craft firmware project written in Wiring (e.g. Arduino C++) for our ESP32-based boards. 
 if you want to update firmware of your board, download the compiled binaries from binaries folder and upload them to your board at espcraft.local/update
 

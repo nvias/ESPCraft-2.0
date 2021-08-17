@@ -9,7 +9,7 @@
 #include <Preferences.h>
 #include <AsyncTCP.h>
 #include <ESPAsyncWebServer.h>
-#include <AsyncElegantOTA.h>
+//#include <AsyncElegantOTA.h>
 #include <SPIFFS.h>
 #include <HTTPClient.h>
 
