@@ -1,0 +1,4 @@
+Used 3rd party libs:
+=================================================
+QueueArray (GNU-GPL 3)
+

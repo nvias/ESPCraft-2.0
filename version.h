@@ -1,6 +1,16 @@
-#define OS_VERSION "v.2.0-beta8"
+#define OS_VERSION 0x320A
 /*
 CHANGELOG ------DD/MM/YYYY---------------------------------------------------------------------------------------------------------------
+
+v.2.0 (beta10)   09/06/2021 (build 0x320A - froggo)
+      O..O
+     (-~~-)   (\/)
+    ( >__< )  (..)
+    ^^ ~~ ^^ C(")(")
+
+- complete firmware rebuild
+- step-up - upgrade to (semi) Operating System (separating core & additional modules)
+- meet Froggo - mascot for this version & his little bunny friend
 
 v.2.0 (beta8)   07/06/2021
 - added boot codes (user led is flashing)

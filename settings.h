@@ -1,4 +1,4 @@
-
+/*
 #define LED_BUILTIN 17                                  // Vestavěná LED
 #define BUZZER_PIN  33                                  // Vestavěný bzučák
 #define OCTAVE      6                                   // Pracovní tónová oktáva
@@ -25,7 +25,7 @@ String mainTopic = "PI1";                               // Topic pro propojení 
 
 #define MQTT_SERVER "147.228.121.4"                     // Adresa MQTT serveru na který se deska připojuje
 #define MQTT_PORT   80                                  // Port pro připojení k MQTT serveru
-
+*/
 /*
 #define LED_BUILTIN 17                                  // Vestavěná LED
 #define BUZZER_PIN  33                                  // Vestavěný bzučák
