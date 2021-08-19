@@ -1,3 +1,5 @@
+<link rel="stylesheet" href="https://www.w3schools.com/w3css/4/w3.css">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Raleway">
 <hr/>
 <p align="center">
 <img src="https://img.shields.io/github/last-commit/nvias/ESPCraft-2.0.svg?style=for-the-badge" />
@@ -14,6 +16,12 @@
 # ESPCraft-2.0 (Work in progress, please use ver. 2.0-beta8 from releases)
 New ESP Craft firmware project written in Wiring (e.g. Arduino C++) for our ESP32-based boards. 
 if you want to update firmware of your board, download the compiled binaries from binaries folder and upload them to your board at espcraft.local/update
+
+# Project progress: 
+<br>
+<div class="w3-grey w3-round">
+   <div class="w3-container w3-center w3-padding w3-green w3-round" style="width:25%">+25%</div>
+</div>
 
 # News in release 2.0-beta10 (07/06/2021) (build 0x320A)
 - full-fat rework of entire firmware
