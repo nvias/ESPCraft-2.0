@@ -1,5 +1,3 @@
-<link rel="stylesheet" href="https://www.w3schools.com/w3css/4/w3.css">
-<link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Raleway">
 <hr/>
 <p align="center">
 <img src="https://img.shields.io/github/last-commit/nvias/ESPCraft-2.0.svg?style=for-the-badge" />
@@ -8,7 +6,7 @@
 &nbsp;
 <img src="https://img.shields.io/github/license/nvias/ESPCraft-2.0.svg?style=for-the-badge" />
 &nbsp;
-<img src="https://img.shields.io/github/v/tag/nvias/ESPCraft-2.0?label=LATEST&style=for-the-badge" />
+<a href="https://github.com/nvias/ESPCraft-2.0/releases"><img src="https://img.shields.io/github/v/tag/nvias/ESPCraft-2.0?label=LATEST&style=for-the-badge" /></a>
 &nbsp;
 </p>
 <hr/>
@@ -17,12 +15,6 @@
 New ESP Craft firmware project written in Wiring (e.g. Arduino C++) for our ESP32-based boards. 
 if you want to update firmware of your board, download the compiled binaries from binaries folder and upload them to your board at espcraft.local/update
 
-# Project progress: 
-<br>
-<div class="w3-grey w3-round">
-   <div class="w3-container w3-center w3-padding w3-green w3-round" style="width:25%">+25%</div>
-</div>
-
 # News in release 2.0-beta10 (07/06/2021) (build 0x320A)
 - full-fat rework of entire firmware
 - boot codes rework
@@ -30,6 +22,7 @@ if you want to update firmware of your board, download the compiled binaries fro
 - new system for work with flash (eeprom) (not backwards compatible with older mode bcs of new memory map!)
 - new WEBGUI on the go...
 - multitasking...
+- it's still not ready even for pre-release
 
 # Naming scheme
 - Every OS build has 2-byte version number saved in board memory
