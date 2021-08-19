@@ -4,7 +4,7 @@
 &nbsp;
 <img src="https://img.shields.io/travis/com/nvias/ESPCraft-2.0.svg/master?style=for-the-badge" />
 &nbsp;
-<img src="https://img.shields.io/github/license/nvias/ESPCraft-2.0.svg?style=for-the-badge" />
+<a href="https://github.com/nvias/ESPCraft-2.0/blob/main/LICENSE"><img src="https://img.shields.io/github/license/nvias/ESPCraft-2.0.svg?style=for-the-badge" /></a>
 &nbsp;
 <a href="https://github.com/nvias/ESPCraft-2.0/releases"><img src="https://img.shields.io/github/v/tag/nvias/ESPCraft-2.0?label=LATEST&style=for-the-badge" /></a>
 &nbsp;

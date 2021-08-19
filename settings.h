@@ -1,4 +1,4 @@
-/*
+
 #define LED_BUILTIN 17                                  // Vestavěná LED
 #define BUZZER_PIN  33                                  // Vestavěný bzučák
 #define OCTAVE      6                                   // Pracovní tónová oktáva
@@ -6,6 +6,7 @@
 #define LIGHT_SNS   36                                  // Vestavěný senzor světla
 #define USER_BTN    0                                   // Tlačítko na desce (na nových verzích GPIO 0, na starších GPIO 16)
 
+/*
 const char perips[3][5] = {{"push"},                    // Jména základních externích periferií
                            {"pot"},                     // (ID) tlačítko - 0, potenciometr - 1, ledky - 2
                            {"leds"}};
