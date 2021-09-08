@@ -23,21 +23,35 @@ Perry::Perry(int stack_size, int priority)  // Specify stack size (in Bytes) of 
 }
 //=================================================================================================================================
 
-void Perry::init(void)
+int Perry::init(void)
 {
     perrySettings.begin("perry", true);
-    perip.usrLed = perrySettings.getUChar("usrLed", 0);
-    perip.buzzer = perrySettings.getUChar("buzzer", 0);
-    perip.tempSns = perrySettings.getUChar("tempSns", 0);
-    perip.lightSns = perrySettings.getUChar("lightSns", 0);
-    perip.usrBtn = perrySettings.getUChar("usrBtn", 0);
-    perip.pixelMatrix = perrySettings.getUChar("pixelMatrix", 0);
+    perip.usrLed = perrySettings.getUChar("usrLed", 0xFF);
+    perip.buzzer = perrySettings.getUChar("buzzer", 0xFF);
+    perip.tempSns = perrySettings.getUChar("tempSns", 0xFF);
+    perip.lightSns = perrySettings.getUChar("lightSns", 0xFF);
+    perip.usrBtn = perrySettings.getUChar("usrBtn", 0xFF);
+    perip.pixelMatrix = perrySettings.getUChar("pixelMatrix", 0xFF);
     perrySettings.end();
+
     pinMode(perip.usrLed, OUTPUT);
     pinMode(perip.buzzer, OUTPUT);
     pinMode(perip.lightSns, INPUT);
     pinMode(perip.usrBtn, INPUT_PULLUP);
+    digitalWrite(perip.usrLed, HIGH);
 
+    if(perip.buzzer == 0xFF||perip.lightSns == 0xFF||perip.pixelMatrix == 0xFF||perip.tempSns == 0xFF||perip.usrBtn == 0xFF||perip.usrLed == 0xFF)
+    {
+        return PERRY_FAIL;
+    }
+    else if((readTemp(perip.tempSns) < -100) || (readLight(perip.lightSns) == 0))
+    {
+        return PERRY_FAIL;
+    }
+    else
+    {
+        return PERRY_OK;
+    }
 }
 //=================================================================================================================================
 void Perry::coldBoot(void)
@@ -72,7 +86,7 @@ void Perry::blinkLed(int blinkCode)
 //=================================================================================================================================
 
 static int buzzCode = 0x00000000;                       // Communication variable
-void Perry::buzzTone()
+void Perry::buzzTone(int pin)
 {
     int buzzPin = 33;
     for(;;)
@@ -88,14 +102,22 @@ void Perry::buzzTone()
     }
 }
 //=================================================================================================================================
-void Perry::readLight(void)
+int Perry::readLight(int pin)
 {
-
+    int value = analogRead(pin);
+    if(value == 0)
+    {
+        return 0;
+    }
+    else
+    {
+        return map(value, 0, 4096, 0, 16);
+    }
 }
 //=================================================================================================================================
-void Perry::readTemp(void)
+int Perry::readTemp(int pin)
 {
-
+    return 20;
 }
 //=================================================================================================================================
 void statusLed(void *parameter)

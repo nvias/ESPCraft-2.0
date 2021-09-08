@@ -13,12 +13,18 @@
 #include <SPIFFS.h>
 #include <HTTPClient.h>
 
+//===== BOOT CODES =============================================================================
+#define NETTY_OK             0xFFFFE7FF        // ##---OO---##
+#define NETTY_FAIL           0xFFFF81FF        // ##-OOOOOO-##
+//==============================================================================================
+
+
 class Netty
 {
     public:
         Netty(void);
         void coldBoot();
-        void init();
+        int init();
 
     private:
     

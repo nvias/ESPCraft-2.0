@@ -5,19 +5,21 @@
 #include <nvs_flash.h>                                          // NVS flash additional fonctionality lib.
 Preferences settings;
 
-//#include "src/3rdparty/QueueArray/QueueArray.h"                 // CommandcoreQueue library
+#define FORCE_COLD_BOOT 0                                       // Force cold boot
+
+//#include "src/3rdparty/QueueArray/QueueArray.h"               // CommandcoreQueue library
 //QueueArray <String>coreQueue;
 
-#include "src/Commpy/Commpy.h"                                // Commpy (Communication provider)
+#include "src/Commpy/Commpy.h"                                  // Commpy (Communication provider)
 Commpy commpy;
 
-#include "src/Netty/Netty.h"                                  // Netty (Internet services interface)
+#include "src/Netty/Netty.h"                                    // Netty (Internet services interface)
 Netty netty;
 
 #include "src/Perry/Perry.h"                                    // Perry (Periphreals interface)
 Perry perry(2048, 1);
 
-#include "src/Porty/Porty.h"                                  // Porty (IO port interface)
+#include "src/Porty/Porty.h"                                    // Porty (IO port interface)
 Porty porty;
 
 typedef struct Message 
@@ -33,18 +35,20 @@ void setup()
 {
     delay(1000);
     settings.begin("os-pref", true);
+    Serial.begin(115200);
 
 //=================  BOOT SELFCHECK =================
-    if(settings.getUChar("boot", 0) == 1){
+    if(!settings.getUChar("boot", 0) || FORCE_COLD_BOOT){
         // COLD BOOT HANDLER
         // UPGRADE PROCEDURE NOT IMPLEMENTED YET
-        Serial.begin(115200);
         Serial.println("Cold boot");
         settings.end();
         nvs_flash_erase();
         nvs_flash_init();
         settings.begin("os-pref", false);
+        settings.putUChar("boot", 1);
         settings.putUShort("version", OS_VERSION);
+        settings.putUShort("board-ver", BOARD_VER);
         settings.end();
 
         commpy.coldBoot();
@@ -54,12 +58,14 @@ void setup()
     }
     coreQueue = xQueueCreate(16, sizeof(Message));
 
-    commpy.init();
-    netty.init();
-    perry.init();
-    porty.init();
+    int status = commpy.init();
+    status = status & netty.init();
+    status = status & perry.init();
+    status = status & porty.init();
 
-    perry.blinkLed(0xF0F0F0F0);
+    perry.blinkLed(status);
+    Serial.print("Boot code: ");
+    Serial.println(status, HEX);
     
 //===================================================
 
@@ -74,4 +80,6 @@ void loop()
     {
         vTaskDelay(portTICK_PERIOD_MS);
     }
+    commpy.get();
+    delay(500 + random(-50,50));
 }

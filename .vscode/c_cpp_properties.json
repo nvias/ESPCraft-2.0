@@ -93,14 +93,14 @@
                 "C:\\Users\\Jirka Švihla\\AppData\\Local\\Arduino15\\packages\\esp32\\hardware\\esp32\\1.0.6\\variants\\esp32",
                 "C:\\Users\\Jirka Švihla\\AppData\\Local\\Arduino15\\packages\\esp32\\hardware\\esp32\\1.0.6\\libraries\\Preferences\\src",
                 "C:\\Users\\Jirka Švihla\\OneDrive\\Dokumenty\\Arduino\\libraries\\PubSubClient\\src",
+                "C:\\Users\\Jirka Švihla\\AppData\\Local\\Arduino15\\packages\\esp32\\hardware\\esp32\\1.0.6\\libraries\\HTTPClient\\src",
                 "C:\\Users\\Jirka Švihla\\AppData\\Local\\Arduino15\\packages\\esp32\\hardware\\esp32\\1.0.6\\libraries\\WiFi\\src",
+                "C:\\Users\\Jirka Švihla\\AppData\\Local\\Arduino15\\packages\\esp32\\hardware\\esp32\\1.0.6\\libraries\\WiFiClientSecure\\src",
                 "C:\\Users\\Jirka Švihla\\AppData\\Local\\Arduino15\\packages\\esp32\\hardware\\esp32\\1.0.6\\libraries\\ESPmDNS\\src",
                 "C:\\Users\\Jirka Švihla\\OneDrive\\Dokumenty\\Arduino\\libraries\\AsyncTCP-master\\src",
                 "C:\\Users\\Jirka Švihla\\OneDrive\\Dokumenty\\Arduino\\libraries\\ESPAsyncWebServer-master\\src",
                 "C:\\Users\\Jirka Švihla\\AppData\\Local\\Arduino15\\packages\\esp32\\hardware\\esp32\\1.0.6\\libraries\\FS\\src",
                 "C:\\Users\\Jirka Švihla\\AppData\\Local\\Arduino15\\packages\\esp32\\hardware\\esp32\\1.0.6\\libraries\\SPIFFS\\src",
-                "C:\\Users\\Jirka Švihla\\AppData\\Local\\Arduino15\\packages\\esp32\\hardware\\esp32\\1.0.6\\libraries\\HTTPClient\\src",
-                "C:\\Users\\Jirka Švihla\\AppData\\Local\\Arduino15\\packages\\esp32\\hardware\\esp32\\1.0.6\\libraries\\WiFiClientSecure\\src",
                 "C:\\Users\\Jirka Švihla\\OneDrive\\Dokumenty\\Arduino\\libraries\\FastLED"
             ],
             "forcedInclude": [
