@@ -25,6 +25,7 @@
 #include <Preferences.h>
 #include <PubSubClient.h>
 #include <HTTPClient.h>
+#include <ArduinoJson.h>
 #include <WiFi.h>
 #include <ESPmDNS.h>
 
@@ -35,10 +36,9 @@ class Commpy
         void coldBoot();
         int init();
         void reconnect();
-        void send();
-        void get();
-        void write(int channel, String data);
-        void read(int channel, String data);
+        void send(int channel, int data);
+        void startPolling();
+        int get(int channel);
 
     private:
     

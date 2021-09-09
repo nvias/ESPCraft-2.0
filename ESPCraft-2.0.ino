@@ -66,6 +66,8 @@ void setup()
     perry.blinkLed(status);
     Serial.print("Boot code: ");
     Serial.println(status, HEX);
+
+    commpy.startPolling();
     
 //===================================================
 
@@ -73,13 +75,29 @@ void setup()
 
 void loop()
 {
-    if (xQueueReceive(coreQueue, (void *)&msg, 0) == pdTRUE) {
-
-    }
-    else
+    int lastState = 0;
+    int lastColorState = 0;
+    while(1)
     {
-        vTaskDelay(portTICK_PERIOD_MS);
+        if (xQueueReceive(coreQueue, (void *)&msg, 0) == pdTRUE) {
+            // ...
+        }
+        else
+        {
+            int state = porty.readButton();
+            if(state != lastState)
+            {
+                lastState = state;
+                commpy.send(02, state);
+            }
+            state = commpy.get(1);
+            if(state != lastColorState)
+            {
+                Serial.println("Color change");
+                lastColorState = state;
+                perry.show(((uint8_t) state)*17, 255, 255);
+            }
+            vTaskDelay(portTICK_PERIOD_MS);
+        }
     }
-    commpy.get();
-    delay(500 + random(-50,50));
 }

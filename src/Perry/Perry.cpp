@@ -3,6 +3,7 @@
 #define QUEUE_SIZE  4       // Data array for communication between Perry tasks
 int queueArray[QUEUE_SIZE]; // 0 - USR_LED, 1-BUZZER, 2-TEMP, 3-LIGHT_SNS
 
+CRGBArray<NUM_PIXELS> leds;
 Preferences perrySettings;
 
 typedef struct perryPinout
@@ -39,6 +40,9 @@ int Perry::init(void)
     pinMode(perip.lightSns, INPUT);
     pinMode(perip.usrBtn, INPUT_PULLUP);
     digitalWrite(perip.usrLed, HIGH);
+    int mtx_pin = (int) perip.pixelMatrix;
+    FastLED.addLeds<WS2812B,PIXEL_PIN>(leds, NUM_PIXELS);
+    FastLED.setBrightness(BRIGHTNESS);
 
     if(perip.buzzer == 0xFF||perip.lightSns == 0xFF||perip.pixelMatrix == 0xFF||perip.tempSns == 0xFF||perip.usrBtn == 0xFF||perip.usrLed == 0xFF)
     {
@@ -133,4 +137,12 @@ void statusLed(void *parameter)
     }
     digitalWrite(perip.usrLed, HIGH);
     vTaskDelete(NULL);
+}
+
+void Perry::show(uint8_t hue, uint8_t saturation, uint8_t value)
+{
+    for(int i = 0; i < NUM_PIXELS; i++) {   
+        leds[i] = CHSV(hue,saturation,value);
+    }
+    FastLED.show();
 }

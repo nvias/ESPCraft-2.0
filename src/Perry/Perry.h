@@ -6,7 +6,8 @@
 #define Perry_h
 
 #include <Arduino.h>
-#include <Preferences.h> 
+#include <Preferences.h>
+#include <FastLED.h> 
 
 //===== DEFAULTS ===============================================================================
 #define LED_BUILTIN 17                  // Vestavěná LED
@@ -18,7 +19,7 @@
 
 #define NUM_PIXELS  64                  // Počet LED diod na displeji v kitu
 #define PIXEL_PIN   27                  // Pin na kterém jsou připojeny
-#define BRIGHTNESS  32                  // Jas LED diod
+#define BRIGHTNESS  255                 // Jas LED diod
 //==============================================================================================
 
 //===== BOOT CODES =============================================================================
@@ -36,6 +37,7 @@ class Perry
         int readLight(int pin);
         void buzzTone(int pin);
         void blinkLed(int blinkCode);
+        void show(uint8_t hue, uint8_t saturation, uint8_t value);
     private:
         int _stack_size;
         int _priority;
