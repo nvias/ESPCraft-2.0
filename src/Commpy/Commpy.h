@@ -28,6 +28,7 @@
 #include <ArduinoJson.h>
 #include <WiFi.h>
 #include <ESPmDNS.h>
+#include "../3rdparty/QueueArray/QueueArray.h"
 
 class Commpy
 {
@@ -35,13 +36,14 @@ class Commpy
         Commpy(void);
         void coldBoot();
         int init();
-        void reconnect();
-        void send(int channel, int data);
-        void startPolling();
-        int get(int channel);
+        void reconnect(String name);
+        void sendMessage(String channel, String data);
+        String getMessage();
+        int getMessages();
 
     private:
-    
+        String _mqtt_server;
+        unsigned int _mqtt_port;
 };
 
 #endif

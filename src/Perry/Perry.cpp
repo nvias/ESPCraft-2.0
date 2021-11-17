@@ -3,6 +3,9 @@
 #define QUEUE_SIZE  4       // Data array for communication between Perry tasks
 int queueArray[QUEUE_SIZE]; // 0 - USR_LED, 1-BUZZER, 2-TEMP, 3-LIGHT_SNS
 
+OneWire oneWire(TEMP_PIN);
+DallasTemperature sensor(&oneWire);
+
 CRGBArray<NUM_PIXELS> leds;
 Preferences perrySettings;
 
@@ -43,10 +46,11 @@ int Perry::init(void)
     int mtx_pin = (int) perip.pixelMatrix;
     FastLED.addLeds<WS2812B,PIXEL_PIN>(leds, NUM_PIXELS);
     FastLED.setBrightness(BRIGHTNESS);
+    sensor.begin();
 
     if(perip.buzzer == 0xFF||perip.lightSns == 0xFF||perip.pixelMatrix == 0xFF||perip.tempSns == 0xFF||perip.usrBtn == 0xFF||perip.usrLed == 0xFF)
     {
-        return PERRY_FAIL;
+        return 0xFF80FFFF;
     }
     else if((readTemp(perip.tempSns) < -100) || (readLight(perip.lightSns) == 0))
     {
@@ -121,7 +125,8 @@ int Perry::readLight(int pin)
 //=================================================================================================================================
 int Perry::readTemp(int pin)
 {
-    return 20;
+    sensor.requestTemperatures();
+    return sensor.getTempCByIndex(0);
 }
 //=================================================================================================================================
 void statusLed(void *parameter)

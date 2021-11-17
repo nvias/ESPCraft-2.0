@@ -25,6 +25,7 @@ class Netty
         Netty(void);
         void coldBoot();
         int init();
+        String update();
 
     private:
     

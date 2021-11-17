@@ -7,7 +7,8 @@
 
 #include <Arduino.h>
 #include <Preferences.h>
-#include <FastLED.h> 
+#include <FastLED.h>
+#include <DallasTemperature.h> 
 
 //===== DEFAULTS ===============================================================================
 #define LED_BUILTIN 17                  // Vestavěná LED
